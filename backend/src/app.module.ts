@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {AppModule as FirstAppModule} from './first_app/module'
-
+import { FirstAppModule } from './first_app/module';
+import { UserModule } from './users/module';
 
 @Module({
   imports: [
@@ -12,10 +12,11 @@ import {AppModule as FirstAppModule} from './first_app/module'
       username: 'postgres',
       password: '1234',
       database: 'nestjs_orm',
-      entities: ["dist/**/*.entity{.ts,.js}"],
+      entities: ['dist/**/entity{.ts,.js}'],
       synchronize: true, // this shouldn't be used in prod
     }),
     FirstAppModule,
+    UserModule,
   ],
 })
 export class AppModule {}

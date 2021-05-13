@@ -1,12 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from '../first_app/service';
+import { Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Request } from 'express';
+import { UserService } from './service';
 
-@Controller('name')
-export class NameController {
-  constructor(private readonly appService: AppService) {}
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Post()
+  create(
+    @Req() request: Request,
+    @Query('email') email: string,
+    @Query('username') username: string,
+  ) {
+    return this.userService.create(email, username);
+  }
 
   @Get()
-  getName() {
-    return this.appService.getAppName();
+  getAll() {
+    return this.userService.findAll();
+  }
+
+  @Get(':id')
+  get(@Req() request: Request, @Param('id') id: string) {
+    return this.userService.findOne(id);
   }
 }

@@ -3,9 +3,10 @@ import { Request } from 'express';
 import { User } from 'src/interfaces/User';
 import { AppService } from './service';
 
-@Controller('user')
+@Controller('first-app')
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
   @Get()
   getAll(@Req() request: Request): User[] {
     return this.appService.getAllUsers();

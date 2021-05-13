@@ -10,4 +10,4 @@ const PROVIDERS = [AppService];
   controllers: CONTROLLERS,
   providers: PROVIDERS,
 })
-export class AppModule {}
+export class FirstAppModule {}
