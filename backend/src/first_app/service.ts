@@ -11,7 +11,6 @@ export class AppService {
 
   getUser(id: number): User {
     const user = USERS.find(item => item.id == id);
-    console.log(user);
     
     return user
   }

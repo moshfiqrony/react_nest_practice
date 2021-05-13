@@ -12,10 +12,8 @@ export class UserService {
   ) {}
 
   async saveToken(token: string, user){
-    console.log(user, 'from save token');
     
     let dbuser = await this.usersRepository.save({id: user.id, token: token})
-    console.log(dbuser);
     
     if(dbuser){
       return({

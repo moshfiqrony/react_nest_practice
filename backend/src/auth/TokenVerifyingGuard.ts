@@ -15,7 +15,6 @@ export class TokenVerifyingGuard implements CanActivate {
     
     const token = headers.authorization.split(' ')[1];
     const dbUser = await this.userService.findOneById(user.id);
-    console.log(dbUser);
     
     if(dbUser.ok && token === dbUser.data.token){
         return true
