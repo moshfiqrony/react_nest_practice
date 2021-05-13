@@ -11,6 +11,25 @@ export class UserService {
     private usersRepository: Repository<User>,
   ) {}
 
+  async saveToken(token: string, user){
+    console.log(user, 'from save token');
+    
+    let dbuser = await this.usersRepository.save({id: user.id, token: token})
+    console.log(dbuser);
+    
+    if(dbuser){
+      return({
+        ok: true,
+        data: dbuser
+      })
+    }else{
+      return({
+        ok: false,
+        error: 'no user'
+      })
+    }
+  }
+
   async create(email: string, username: string, password: string) {
     const hashPass = bcrypt.hashSync(password, 10);
     try {

@@ -7,9 +7,9 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { JWTAuthGuard } from 'src/auth/JWTAuthGurd';
+import { JWTAuthGuard } from 'src/auth/JWTAuthGuard';
+import { TokenVerifyingGuard } from 'src/auth/TokenVerifyingGuard';
 import { UserService } from './service';
 
 @Controller('user')
@@ -26,6 +26,7 @@ export class UserController {
     return this.userService.create(email, username, password);
   }
 
+  @UseGuards(TokenVerifyingGuard)
   @UseGuards(JWTAuthGuard)
   @Get('me')
   get(@Req() request: any) {
