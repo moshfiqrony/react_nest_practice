@@ -1,5 +1,15 @@
-import { Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { JWTAuthGuard } from 'src/auth/JWTAuthGurd';
 import { UserService } from './service';
 
 @Controller('user')
@@ -11,17 +21,14 @@ export class UserController {
     @Req() request: Request,
     @Query('email') email: string,
     @Query('username') username: string,
+    @Query('password') password: string,
   ) {
-    return this.userService.create(email, username);
+    return this.userService.create(email, username, password);
   }
 
-  @Get()
-  getAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  get(@Req() request: Request, @Param('id') id: string) {
-    return this.userService.findOne(id);
+  @UseGuards(JWTAuthGuard)
+  @Get('me')
+  get(@Req() request: any) {
+    return this.userService.findOneById(request.user.id);
   }
 }

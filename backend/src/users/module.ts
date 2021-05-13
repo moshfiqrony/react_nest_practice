@@ -9,6 +9,7 @@ const PROVIDERS = [UserService];
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
+  exports: PROVIDERS,
   controllers: CONTROLLERS,
   providers: PROVIDERS,
 })

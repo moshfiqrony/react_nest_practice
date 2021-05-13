@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity';
+const bcrypt = require('bcrypt');
 
 @Injectable()
 export class UserService {
@@ -10,11 +11,13 @@ export class UserService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(email: string, username: string) {
+  async create(email: string, username: string, password: string) {
+    const hashPass = bcrypt.hashSync(password, 10);
     try {
       let user = await this.usersRepository.save({
         email: email,
         username: username,
+        password: hashPass,
       });
 
       return {
@@ -44,16 +47,47 @@ export class UserService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(username: string, password: string) {
+    const hashPass = bcrypt.hashSync(password, 10);
     try {
-      const user = await this.usersRepository.findOne(id);
-      return {
-        ok: true,
-        data: user,
-      };
+      const user = await this.usersRepository.findOne({
+        username: username,
+      });
+      
+      if(user && bcrypt.compareSync(password, user.password)){
+        return {
+          ok: true,
+          data: user,
+        };
+      }else{
+        return null
+      }
     } catch (error) {
       return {
-        ok: true,
+        ok: false,
+        data: error.toString(),
+      };
+    }
+  }
+
+  async findOneById(id: string) {
+    try {
+      const user = await this.usersRepository.findOne(id);
+      delete user.password
+      if (user) {
+        return {
+          ok: true,
+          data: user,
+        };
+      } else {
+        return {
+          ok: false,
+          error: 'Can not find the user',
+        };
+      }
+    } catch (error) {
+      return {
+        ok: false,
         data: error.toString(),
       };
     }
@@ -68,7 +102,7 @@ export class UserService {
       };
     } catch (error) {
       return {
-        ok: true,
+        ok: false,
         data: error.toString(),
       };
     }
