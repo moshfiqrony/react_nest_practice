@@ -18,16 +18,29 @@ export class AuthService {
     }
   }
 
-  async login(user: any) {    
+  async login(user: any) {
     const payload = { username: user.data.username, sub: user.data.id };
     const token = await this.jwtService.signAsync(payload);
     const res = await this.userService.saveToken(token.toString(), user.data);
-    if(res.ok){
+    if (res.ok) {
       return {
-        access_token: token,
+        ok: true,
+        data: {
+          access_token: token,
+        },
       };
-    }else{
+    } else {
       throw new UnauthorizedException();
+    }
+  }
+
+  async logout(user: any){
+    const res = await this.userService.removeToken(user);
+    if(res.ok){
+      return({
+        ok: true,
+        data: 'User logged out'
+      })
     }
   }
 }
