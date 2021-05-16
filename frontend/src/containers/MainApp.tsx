@@ -1,53 +1,50 @@
 import React, { Fragment } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
+import { DangerButton } from "../components/Buttons";
+import { getUser, loginUser, logoutUser, registerUser } from "../services/User.service";
 import LoginForm from "./Login";
 import RegisterForm from "./Register";
 
 const ClientApp = () => {
   const { data, error, isLoading } = useQuery({
-    queryKey: 'user',
-    queryFn: () =>
-      fetch(`http://localhost:8000/api/me`, {
-        method: "GET",
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }).then((res) => res.json()),
-      retry: false,
-      refetchOnWindowFocus: false
+    queryKey: "user",
+    queryFn: getUser,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
+  const queryClient = useQueryClient();
 
-  const handleRegister = (
+  const handleRegister = async (
     username: string,
     password: string,
     email: string
   ) => {
-    fetch(
-      `http://localhost:8000/api/auth/register?username=${username}&email=${email}&password=${password}`,
-      {
-        method: "POST",
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
+    const response = await registerUser(username, email, password);
+    if (response?.ok) {
+      alert("Registration successful");
+    } else {
+      alert("Registration unsuccessful");
+    }
   };
 
-  const handleLogin = (username: string, password: string) => {
-    fetch(
-      `http://localhost:8000/api/auth/login?username=${username}&password=${password}`,
-      {
-        method: "POST",
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        localStorage.setItem("token", res.access_token);
-      })
-      .catch((err) => console.log(err));
+  const handleLogin = async (username: string, password: string) => {
+    const response = await loginUser(username, password);
+    if (response?.ok) {
+      localStorage.setItem("token", response.data.access_token);
+      queryClient.invalidateQueries("user");
+    } else {
+      alert("Login unsuccessful");
+    }
   };
+
+  const handleLogout = async() => {
+    const response = await logoutUser();
+    console.log('logout response', response);
+    if(response.ok){
+      localStorage.clear();
+      queryClient.invalidateQueries("user");
+    }
+  }
 
   const state = data?.data;
 
@@ -62,6 +59,9 @@ const ClientApp = () => {
             <p>Username: {state.username}</p>
             <p>Email: {state.email}</p>
             <p>Is active: {state.isActive.toString()}</p>
+            <div style={{width: 100}}>
+              <DangerButton name="Logout" onClick={handleLogout}/>
+            </div>
           </div>
         )}
 
