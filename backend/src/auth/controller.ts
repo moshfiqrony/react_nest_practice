@@ -2,6 +2,7 @@ import { Controller, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { UserService } from 'src/users/service';
+import { JWTAuthGuard } from './JWTAuthGuard';
 import { AuthService } from './service';
 
 @Controller('api/auth')
@@ -25,5 +26,11 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request) {
     return this.authService.login(req.user);
+  }
+
+  @UseGuards(JWTAuthGuard)
+  @Post('logout')
+  async logout(@Req() req: Request) {
+    return this.authService.logout(req.user);
   }
 }
